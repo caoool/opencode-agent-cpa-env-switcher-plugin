@@ -1,0 +1,67 @@
+{
+  "name": "opencode-agent-cpa-env-switcher-plugin",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that switches CPA provider prefixes for primary agents, subagents, commands, and default models from CPA_PROVIDER.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "provider",
+    "environment",
+    "agents",
+    "cli-proxy-api"
+  ],
+  "license": "MIT",
+  "author": "Lu Cao",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "default": "./dist/server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caoool/opencode-agent-cpa-env-switcher-plugin.git"
+  },
+  "homepage": "https://github.com/caoool/opencode-agent-cpa-env-switcher-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/caoool/opencode-agent-cpa-env-switcher-plugin/issues"
+  },
+  "engines": {
+    "node": ">=20",
+    "opencode": ">=1.17.15"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "check": "npm run typecheck && npm test",
+    "prepack": "npm run check"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.17.15"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "1.17.15",
+    "@types/node": "24.12.2",
+    "typescript": "5.9.3"
+  }
+}
