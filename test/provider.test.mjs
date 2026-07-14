@@ -36,23 +36,39 @@ test("rewriteModelProvider switches only known CPA provider prefixes", () => {
   assert.equal(rewriteModelProvider("invalid", "cpa-van-base"), "invalid")
 })
 
+test("rewriteModelProvider resolves the {env:CPA_PROVIDER} placeholder", () => {
+  assert.equal(
+    rewriteModelProvider("{env:CPA_PROVIDER}/gpt-5.6-sol", "cpa-van-base"),
+    "cpa-van-base/gpt-5.6-sol",
+  )
+  assert.equal(
+    rewriteModelProvider("{env:CPA_PROVIDER}/claude-fable-5", "cpa-jp-edge"),
+    "cpa-jp-edge/claude-fable-5",
+  )
+  // Unrelated placeholders are left untouched.
+  assert.equal(
+    rewriteModelProvider("{env:OTHER}/gpt-5.6-sol", "cpa-van-base"),
+    "{env:OTHER}/gpt-5.6-sol",
+  )
+})
+
 test("applyActiveProvider rewrites defaults, agents, modes, and commands", () => {
   const config = {
-    model: "cpa-jp-edge/gpt-5.6-sol",
-    small_model: "cpa-jp-edge/gpt-5.6-luna",
+    model: "{env:CPA_PROVIDER}/gpt-5.6-sol",
+    small_model: "{env:CPA_PROVIDER}/gpt-5.6-luna",
     provider: {
       "cpa-van-base": {
         name: "CLI Proxy API VAN Base",
       },
     },
     agent: {
-      orchestrator: { model: "cpa-jp-edge/gpt-5.6-sol", variant: "fast-xhigh" },
+      orchestrator: { model: "{env:CPA_PROVIDER}/gpt-5.6-sol", variant: "fast-xhigh" },
       architect: { model: "cpa-jp-edge/claude-fable-5" },
       external: { model: "anthropic/claude-sonnet-4-6" },
       disabled: { disable: true },
     },
     mode: {
-      legacy: { model: "cpa-jp-edge/gpt-5.6-terra" },
+      legacy: { model: "{env:CPA_PROVIDER}/gpt-5.6-terra" },
     },
     command: {
       review: { template: "Review", model: "cpa-jp-edge/gpt-5.6-luna" },

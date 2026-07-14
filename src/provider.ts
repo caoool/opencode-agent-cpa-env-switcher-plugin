@@ -6,7 +6,15 @@ export const SUPPORTED_PROVIDERS = ["cpa-jp-edge", "cpa-van-base"] as const
 
 export type SupportedProvider = (typeof SUPPORTED_PROVIDERS)[number]
 
+// The literal `{env:CPA_PROVIDER}` placeholder that agent Markdown frontmatter
+// carries. OpenCode expands `{env:...}` in JSON/JSONC config but not in agent
+// Markdown, so the unexpanded placeholder reaches this plugin and is rewritten
+// alongside the concrete provider prefixes.
+export const PROVIDER_PLACEHOLDER = `{env:${PROVIDER_ENV}}`
+
 const providerSet = new Set<string>(SUPPORTED_PROVIDERS)
+
+const rewritablePrefixes = new Set<string>([...SUPPORTED_PROVIDERS, PROVIDER_PLACEHOLDER])
 
 type ModelConfig = {
   model?: string
@@ -34,7 +42,7 @@ export function rewriteModelProvider(model: string, provider: SupportedProvider)
   if (separator <= 0) return model
 
   const currentProvider = model.slice(0, separator)
-  if (!providerSet.has(currentProvider)) return model
+  if (!rewritablePrefixes.has(currentProvider)) return model
 
   return `${provider}${model.slice(separator)}`
 }

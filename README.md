@@ -8,8 +8,27 @@ Supported provider IDs:
 - `cpa-jp-edge`
 - `cpa-van-base`
 
-The plugin changes only known CPA provider prefixes. Model IDs, variants,
-prompts, permissions, and unrelated providers remain unchanged.
+The plugin rewrites known CPA provider prefixes and the literal
+`{env:CPA_PROVIDER}` placeholder. Model IDs, variants, prompts, permissions, and
+unrelated providers remain unchanged.
+
+## Environment-neutral agent files
+
+OpenCode expands `{env:VAR}` references in `opencode.json` before parsing, but
+it does **not** expand them inside agent Markdown frontmatter. To keep agent
+files environment-neutral, write the literal placeholder as the model prefix:
+
+```markdown
+---
+mode: subagent
+model: "{env:CPA_PROVIDER}/gpt-5.6-sol"
+---
+```
+
+The unexpanded `{env:CPA_PROVIDER}` prefix reaches this plugin at startup and is
+rewritten to the selected provider, exactly like a concrete `cpa-jp-edge` or
+`cpa-van-base` prefix. Agent files therefore never name a specific endpoint and
+switching environments creates no Git diff.
 
 ## Install
 
@@ -87,13 +106,15 @@ At startup the plugin updates the provider prefix for:
 - deprecated `mode` agent entries
 - command-specific models
 
-For example, with `CPA_PROVIDER=cpa-van-base`:
+A prefix is rewritten when it is `cpa-jp-edge`, `cpa-van-base`, or the literal
+`{env:CPA_PROVIDER}` placeholder. For example, with `CPA_PROVIDER=cpa-van-base`:
 
 ```text
 cpa-jp-edge/claude-fable-5
+{env:CPA_PROVIDER}/claude-fable-5
 ```
 
-resolves in memory as:
+both resolve in memory as:
 
 ```text
 cpa-van-base/claude-fable-5

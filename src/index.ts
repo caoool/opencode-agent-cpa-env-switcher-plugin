@@ -4,6 +4,7 @@ export default server
 export { server }
 export {
   PROVIDER_ENV,
+  PROVIDER_PLACEHOLDER,
   SUPPORTED_PROVIDERS,
   applyActiveProvider,
   resolveActiveProvider,
