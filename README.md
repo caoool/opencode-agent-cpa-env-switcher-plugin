@@ -5,6 +5,7 @@ and rewrites configured model provider prefixes in memory at startup.
 
 Supported provider IDs:
 
+- `cpa-local`
 - `cpa-jp-edge`
 - `cpa-van-base`
 
@@ -26,9 +27,9 @@ model: "{env:CPA_PROVIDER}/gpt-5.6-sol"
 ```
 
 The unexpanded `{env:CPA_PROVIDER}` prefix reaches this plugin at startup and is
-rewritten to the selected provider, exactly like a concrete `cpa-jp-edge` or
-`cpa-van-base` prefix. Agent files therefore never name a specific endpoint and
-switching environments creates no Git diff.
+rewritten to the selected provider, exactly like a concrete `cpa-local`,
+`cpa-jp-edge`, or `cpa-van-base` prefix. Agent files therefore never name a
+specific endpoint and switching environments creates no Git diff.
 
 ## Install
 
@@ -106,8 +107,9 @@ At startup the plugin updates the provider prefix for:
 - deprecated `mode` agent entries
 - command-specific models
 
-A prefix is rewritten when it is `cpa-jp-edge`, `cpa-van-base`, or the literal
-`{env:CPA_PROVIDER}` placeholder. For example, with `CPA_PROVIDER=cpa-van-base`:
+A prefix is rewritten when it is `cpa-local`, `cpa-jp-edge`, `cpa-van-base`, or
+the literal `{env:CPA_PROVIDER}` placeholder. For example, with
+`CPA_PROVIDER=cpa-van-base`:
 
 ```text
 cpa-jp-edge/claude-fable-5
@@ -123,8 +125,8 @@ cpa-van-base/claude-fable-5
 Tracked agent files are not modified, so switching environments does not create
 a Git diff.
 
-Models belonging to providers other than `cpa-jp-edge` and `cpa-van-base` are
-left unchanged.
+Models belonging to providers other than `cpa-local`, `cpa-jp-edge`, and
+`cpa-van-base` are left unchanged.
 
 ## Failure behavior
 

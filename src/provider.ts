@@ -2,7 +2,7 @@ import type { Config } from "@opencode-ai/plugin"
 
 export const PROVIDER_ENV = "CPA_PROVIDER"
 
-export const SUPPORTED_PROVIDERS = ["cpa-jp-edge", "cpa-van-base"] as const
+export const SUPPORTED_PROVIDERS = ["cpa-local", "cpa-jp-edge", "cpa-van-base"] as const
 
 export type SupportedProvider = (typeof SUPPORTED_PROVIDERS)[number]
 

@@ -7,7 +7,8 @@ import {
   rewriteModelProvider,
 } from "../dist/provider.js"
 
-test("resolveActiveProvider accepts both supported providers", () => {
+test("resolveActiveProvider accepts all supported providers", () => {
+  assert.equal(resolveActiveProvider({ CPA_PROVIDER: "cpa-local" }), "cpa-local")
   assert.equal(resolveActiveProvider({ CPA_PROVIDER: "cpa-jp-edge" }), "cpa-jp-edge")
   assert.equal(resolveActiveProvider({ CPA_PROVIDER: " cpa-van-base " }), "cpa-van-base")
 })
@@ -30,6 +31,14 @@ test("rewriteModelProvider switches only known CPA provider prefixes", () => {
     "cpa-jp-edge/claude-fable-5",
   )
   assert.equal(
+    rewriteModelProvider("cpa-local/claude-sonnet-5", "cpa-jp-edge"),
+    "cpa-jp-edge/claude-sonnet-5",
+  )
+  assert.equal(
+    rewriteModelProvider("cpa-jp-edge/claude-sonnet-5", "cpa-local"),
+    "cpa-local/claude-sonnet-5",
+  )
+  assert.equal(
     rewriteModelProvider("anthropic/claude-sonnet-4-6", "cpa-van-base"),
     "anthropic/claude-sonnet-4-6",
   )
@@ -44,6 +53,10 @@ test("rewriteModelProvider resolves the {env:CPA_PROVIDER} placeholder", () => {
   assert.equal(
     rewriteModelProvider("{env:CPA_PROVIDER}/claude-fable-5", "cpa-jp-edge"),
     "cpa-jp-edge/claude-fable-5",
+  )
+  assert.equal(
+    rewriteModelProvider("{env:CPA_PROVIDER}/claude-sonnet-5", "cpa-local"),
+    "cpa-local/claude-sonnet-5",
   )
   // Unrelated placeholders are left untouched.
   assert.equal(
@@ -84,6 +97,27 @@ test("applyActiveProvider rewrites defaults, agents, modes, and commands", () =>
   assert.equal(config.agent.external.model, "anthropic/claude-sonnet-4-6")
   assert.equal(config.mode.legacy.model, "cpa-van-base/gpt-5.6-terra")
   assert.equal(config.command.review.model, "cpa-van-base/gpt-5.6-luna")
+})
+
+test("applyActiveProvider rewrites to cpa-local", () => {
+  const config = {
+    model: "{env:CPA_PROVIDER}/claude-sonnet-5",
+    small_model: "cpa-jp-edge/grok-composer-2.5-fast",
+    provider: {
+      "cpa-local": {
+        name: "CLI Proxy API Local",
+      },
+    },
+    agent: {
+      solo: { model: "cpa-van-base/claude-opus-4-8" },
+    },
+  }
+
+  applyActiveProvider(config, "cpa-local")
+
+  assert.equal(config.model, "cpa-local/claude-sonnet-5")
+  assert.equal(config.small_model, "cpa-local/grok-composer-2.5-fast")
+  assert.equal(config.agent.solo.model, "cpa-local/claude-opus-4-8")
 })
 
 test("applyActiveProvider rejects a provider missing from resolved config", () => {
